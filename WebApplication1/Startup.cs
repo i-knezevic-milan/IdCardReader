@@ -21,10 +21,6 @@ namespace WebApplication1
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            int status = CardReader.EidStartup(CardReader.EID_N_API_VERSION);
-
-
         }
 
         public IConfiguration Configuration { get; }
@@ -33,6 +29,8 @@ namespace WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSingleton<ICardReaderWrapper, CardReaderWrapper>();
 
             services.AddCors(options =>
             {
