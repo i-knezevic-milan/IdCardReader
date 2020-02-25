@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace WebApplication1.EID
+namespace IdCardReaderApi.EID
 {
-    public class CardReader
+    public class IdCardReader
     {
 
         //
@@ -150,8 +147,6 @@ namespace WebApplication1.EID
 
         [DllImport(DLL)] public static extern int EidReadPortrait(ref PortraitEID portraitEID);
 
-        [DllImport(DLL)] public static extern int EidReadCertificate(ref CertificateEID certificateEID);
-
         [DllImport(DLL)] public static extern int EidChangePassword(string szOldPassword, string szNewPassword, ref int pnTriesLeft);
 
         [DllImport(DLL)] public static extern int EidVerifySignature(UInt32 nSignatureID);
@@ -159,6 +154,30 @@ namespace WebApplication1.EID
         public static string EidDecode(byte[] byteArray, int byteArraySize)
         {
             return Encoding.UTF8.GetString(byteArray, 0, byteArraySize);
+        }
+
+        public static string EidMessage(int status)
+        {
+            return status switch
+            {
+                EID_OK => "OK",
+                EID_E_GENERAL_ERROR => "General error",
+                EID_E_INVALID_PARAMETER => "Invalid parameter",
+                EID_E_VERSION_NOT_SUPPORTED => "Version not supported",
+                EID_E_NOT_INITIALIZED => "Not initialized",
+                EID_E_UNABLE_TO_EXECUTE => "Unable to execute",
+                EID_E_READER_ERROR => "Reader error",
+                EID_E_CARD_MISSING => "Card missing",
+                EID_E_CARD_UNKNOWN => "Card unknown",
+                EID_E_CARD_MISMATCH => "Card mismatch",
+                EID_E_UNABLE_TO_OPEN_SESSION => "Unable to open session",
+                EID_E_DATA_MISSING => "Data missing",
+                EID_E_CARD_SECFORMAT_CHECK_ERROR => "Card secformat check error",
+                EID_E_SECFORMAT_CHECK_CERT_ERROR => "Secformat check cert error",
+                EID_E_INVALID_PASSWORD => "Invalid password",
+                EID_E_PIN_BLOCKED => "Pin blocked",
+                _ => "Unknown error",
+            };
         }
 
     }
