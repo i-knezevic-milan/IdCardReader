@@ -6,6 +6,7 @@ using System.Text;
 using IdCardReaderApi.Controllers;
 using IdCardReaderApi.Models;
 using IdCardReaderApi.Models.Responses;
+using System.Text.RegularExpressions;
 
 namespace IdCardReaderApi.EID
 {
@@ -69,7 +70,6 @@ namespace IdCardReaderApi.EID
                     StatusOfForeigner = new byte[IdCardReader.EID_MAX_StatusOfForeigner],
                     NationalityFull = new byte[IdCardReader.EID_MAX_NationalityFull]
                 };
-
                 status = IdCardReader.EidReadFixedPersonalData(ref fixedPersonalDataEID);
 
                 if (status != IdCardReader.EID_OK)
@@ -80,7 +80,18 @@ namespace IdCardReaderApi.EID
                 FixedPersonalData fixedPersonalData = new FixedPersonalData();
 
                 Map(fixedPersonalDataEID, fixedPersonalData);
-
+                
+                if (fixedPersonalData.GivenName != null && fixedPersonalData.GivenName != "") {
+                    fixedPersonalData.GivenNameLatin = this.TranslitCL(fixedPersonalData.GivenName);
+                }
+                if (fixedPersonalData.Surname != null && fixedPersonalData.Surname != "")
+                {
+                    fixedPersonalData.SurnameLatin = this.TranslitCL(fixedPersonalData.Surname);
+                }
+                if (fixedPersonalData.ParentGivenName != null && fixedPersonalData.ParentGivenName != "")
+                {
+                    fixedPersonalData.ParentGivenNameLatin = this.TranslitCL(fixedPersonalData.ParentGivenName);
+                }
                 VariablePersonalDataEID variablePersonalDataEID = new VariablePersonalDataEID()
                 {
                     State = new byte[IdCardReader.EID_MAX_State],
@@ -320,5 +331,29 @@ namespace IdCardReaderApi.EID
         {
             return Encoding.UTF8.GetString(bajtovi, 0, vel);
         }
+
+        private string TranslitCL(string input)
+        {
+            var cyrillic = "А_Б_В_Г_Д_Ђ_Е_Ё_Ж_З_И_Й_Ј_К_Л_Љ_М_Н_Њ_О_П_Р_С_Т_Ћ_У_Ф_Х_Ц_Ч_Џ_Ш_Щ_Ъ_Ы_Ь_Э_Ю_Я_а_б_в_г_д_ђ_е_ё_ж_з_и_й_ј_к_л_љ_м_н_њ_о_п_р_с_т_ћ_у_ф_х_ц_ч_џ_ш_щ_ъ_ы_ь_э_ю_я".Split('_');
+            var latin = "A_B_V_G_D_Đ_E_Ë_Ž_Z_I_J_J_K_L_Lj_M_N_Nj_O_P_R_S_T_Ć_U_F_H_C_Č_Dž_Š_Ŝ_ʺ_Y_ʹ_È_Û_Â_a_b_v_g_d_đ_e_ë_ž_z_i_j_j_k_l_lj_m_n_nj_o_p_r_s_t_ć_u_f_h_c_č_dž_š_ŝ_ʺ_y_ʹ_è_û_â".Split('_');
+
+            var inputArray = Regex.Split(input, String.Empty);
+
+            for (int i = 0; i < inputArray.Length; i++)
+            {
+                for (int c = 0; c < cyrillic.Length; c++)
+                {
+                    if (inputArray[i] == cyrillic[c])
+                    {
+                        inputArray[i] = latin[c];
+                    }
+                }
+            }
+
+            string result = String.Concat(inputArray);
+
+            return result;
+        }
+
     }
 }

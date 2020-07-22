@@ -6,6 +6,9 @@
         public string Surname { get; set; }
         public string GivenName { get; set; }
         public string ParentGivenName { get; set; }
+        public string SurnameLatin { get; set; }
+        public string GivenNameLatin { get; set; }
+        public string ParentGivenNameLatin { get; set; }
         public string Sex { get; set; }
         public string PlaceOfBirth { get; set; }
         public string StateOfBirth { get; set; }
