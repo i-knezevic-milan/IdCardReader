@@ -56,6 +56,13 @@ namespace IdCardReaderApi.EID
 
                 Map(documentDataEID, documentData);
 
+
+                if (!string.IsNullOrEmpty(documentData.IssuingAuthority))
+                {
+                    documentData.IssuingAuthority = this.TranslitCL(documentData.IssuingAuthority);
+                }
+
+
                 FixedPersonalDataEID fixedPersonalDataEID = new FixedPersonalDataEID()
                 {
                     PersonalNumber = new byte[IdCardReader.EID_MAX_PersonalNumber],
@@ -76,12 +83,13 @@ namespace IdCardReaderApi.EID
                 {
                     throw new IdCardReaderException() { Method = "EidReadFixedPersonalData", Status = 3, DisplayMessage = "ID card not inserted. Please try again." };
                 }
-                
+
                 FixedPersonalData fixedPersonalData = new FixedPersonalData();
 
                 Map(fixedPersonalDataEID, fixedPersonalData);
-                
-                if (fixedPersonalData.GivenName != null && fixedPersonalData.GivenName != "") {
+
+                if (fixedPersonalData.GivenName != null && fixedPersonalData.GivenName != "")
+                {
                     fixedPersonalData.GivenNameLatin = this.TranslitCL(fixedPersonalData.GivenName);
                 }
                 if (fixedPersonalData.Surname != null && fixedPersonalData.Surname != "")
@@ -152,7 +160,7 @@ namespace IdCardReaderApi.EID
             {
                 _logger.LogError(e, e.StatusMessage);
                 return controller.StatusCode(
-                    440, 
+                    440,
                     new IdCardDataResponse()
                     {
                         Message = e.DisplayMessage
@@ -163,7 +171,7 @@ namespace IdCardReaderApi.EID
             {
                 IdCardReader.EidEndRead();
             }
-            
+
         }
 
         public ActionResult getDocumentData(IdCardReaderController controller)
@@ -200,6 +208,11 @@ namespace IdCardReaderApi.EID
             DocumentData documentData = new DocumentData();
 
             Map(documentDataEID, documentData);
+
+            if (!string.IsNullOrEmpty(documentData.IssuingAuthority))
+            {
+                documentData.IssuingAuthority = this.TranslitCL(documentData.IssuingAuthority);
+            }
 
             return controller.Ok(documentData);
         }
